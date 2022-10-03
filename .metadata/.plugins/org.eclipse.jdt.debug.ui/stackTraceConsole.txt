@@ -1,0 +1,10 @@
+ while (e.hasMoreElements()) {
+ 
+            // Getting the key of a particular entry
+            int key = e.nextElement();
+ 
+            // Print and display the Rank and Name
+            System.out.println("Rank : " + key
+                               + "\t\t Name : "
+                               + ht.get(key));
+        }
