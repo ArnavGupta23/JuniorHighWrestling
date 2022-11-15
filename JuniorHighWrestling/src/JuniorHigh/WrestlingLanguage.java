@@ -12,7 +12,8 @@ package JuniorHigh;
 class WrestlingLanguage {
  
   
-   public static enum MatchResultType { FALL, TECH, MD, DEC, FFT, INJ, DQ, NC, MFFT };
+   //public static enum MatchResultType { FALL, TECH, MD, DEC, FFT, INJ, DQ, NC, MFFT };
+   public static enum MatchResultType { FALL, MD, DEC, FFT, INJ, TECH };
    public static enum WinOrLose { WIN, LOSS };
    public static enum Grade { G5, G6, G7, G8 };
    public static enum Gender { M, F };

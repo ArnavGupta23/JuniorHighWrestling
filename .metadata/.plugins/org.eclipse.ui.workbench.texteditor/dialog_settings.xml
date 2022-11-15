@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="extractRoster"/>
+		<item key="selection" value="extractDualMatch"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="extractroster"/>
-			<item value="team"/>
-			<item value="setteamname"/>
-			<item value="setteam"/>
-			<item value="t.setteam"/>
-			<item value="t.set"/>
-			<item value="t.setTea"/>
-			<item value="t."/>
-			<item value="t.n"/>
-			<item value="t.name"/>
-			<item value="weight"/>
-			<item value="addLossByFall"/>
-			<item value="pin"/>
-			<item value="response"/>
-			<item value="verboseMessage"/>
+			<item value="extractDualMatch"/>
+			<item value="processDualMatches"/>
+			<item value="namevalH"/>
+			<item value="ddToSummary"/>
+			<item value="addBout"/>
+			<item value="addDualMeet"/>
+			<item value="e"/>
+			<item value="1/2/2007"/>
+			<item value="getFinWeight"/>
+			<item value="getMatchResultType"/>
+			<item value="extractres"/>
+			<item value="initializeDual"/>
+			<item value="extractre"/>
+			<item value="extract"/>
+			<item value="processDualHeaderRows"/>
 		</list>
 		<list key="replacehistory">
 			<item value="JuniorHigh"/>
@@ -30,8 +30,8 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="1103"/>
-		<item key="DIALOG_Y_ORIGIN" value="72"/>
+		<item key="DIALOG_X_ORIGIN" value="417"/>
+		<item key="DIALOG_Y_ORIGIN" value="266"/>
 		<item key="DIALOG_WIDTH" value="336"/>
 		<item key="DIALOG_HEIGHT" value="402"/>
 		<item key="DIALOG_FONT_NAME" value="1|.AppleSystemUIFont|11.0|0|COCOA|1|.AppleSystemUIFont"/>

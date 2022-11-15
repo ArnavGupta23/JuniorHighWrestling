@@ -165,11 +165,12 @@ class GoogleSheetsWriter  {
 	   	ArrayList<Wrestler> aw = new ArrayList<Wrestler> (wc);	
 	   	Comparator<Wrestler> compareIt = new Comparator<Wrestler>() {
 				public int compare(Wrestler w1, Wrestler w2) {
-					String wS=w1.getPrintWeight();
-					String w2S=w2.getPrintWeight();
+					String wS=w1.getFinWeight();
+					String w2S=w2.getFinWeight();
 					
 					int i = wS.compareTo(w2S);
 					if ( i == 0 ) {
+						//check getPrintRank
 						int m1 = w1.getPrintRank();
 						int m2 = w2.getPrintRank();
 						i=m2-m1;
@@ -210,6 +211,7 @@ class GoogleSheetsWriter  {
 		hBorders.setBottom(new Border().setStyle("SOLID_THICK"));
 		headerFormat.setBorders(hBorders);
 			
+		//creating header record
 		CellData weightH = new CellData().setUserEnteredValue(new ExtendedValue().setStringValue("Weight"));
 		headerrow.add(weightH);
 		CellFormat leftHeaderFormat = headerFormat.clone();
@@ -248,6 +250,7 @@ class GoogleSheetsWriter  {
 		CellFormat rightHeaderFormat = headerFormat.clone();
 		rightHeaderFormat.getBorders().setRight(new Border().setStyle("SOLID_THICK"));
 		lastWIH.setUserEnteredFormat(rightHeaderFormat);
+		//end of header record
 		
 		int count=0;
 		String atWeightStr="";
@@ -272,7 +275,7 @@ class GoogleSheetsWriter  {
 			Wrestler w = aw.get(count);
 			System.out.println("w=" + w);
 				
-			String wWeight = w.getPrintWeight();
+			String wWeight = w.getFinWeight();
 				
 			if (! wWeight.equals(atWeightStr)) {
 				atNewWeight=true;
@@ -297,10 +300,11 @@ class GoogleSheetsWriter  {
 			}
 			weightDataCell.setUserEnteredFormat(weightDataCellFormat);
 			if ( atNewWeight ) {
-				weightDataCell.setUserEnteredValue(new ExtendedValue().setStringValue(w.getPrintWeight())) ;
-			} else {
-				weightDataCell.setUserEnteredValue(new ExtendedValue().setStringValue(""))  ;
-			}
+				weightDataCell.setUserEnteredValue(new ExtendedValue().setStringValue(w.getFinWeight())) ;
+			} 
+//			else {
+//				weightDataCell.setUserEnteredValue(new ExtendedValue().setStringValue(w.getFinWeight()))  ;
+			//}
 			if ( oddWeight) { 
 				weightDataCellFormat.setBackgroundColor(greyColor);
 			}
@@ -651,8 +655,8 @@ class GoogleSheetsWriter  {
 
 		Comparator<Wrestler> compareIt = new Comparator<Wrestler>() {
 			public int compare(Wrestler w1, Wrestler w2) {
-				String wS=w1.getPrintWeight();
-				String w2S=w2.getPrintWeight();
+				String wS=w1.getFinWeight();
+				String w2S=w2.getFinWeight();
 				
 				int i = wS.compareTo(w2S);
 				if ( i == 0 ) {
@@ -726,7 +730,7 @@ class GoogleSheetsWriter  {
 			CellData weightDataCell = new CellData(); 
 			CellFormat weightDataCellFormat = leftHeaderFormat.clone();
 			weightDataCell.setUserEnteredFormat(weightDataCellFormat);
-			weightDataCell.setUserEnteredValue(new ExtendedValue().setStringValue(w.getPrintWeight())) ;
+			weightDataCell.setUserEnteredValue(new ExtendedValue().setStringValue(w.getFinWeight())) ;
 			weightDataCellFormat.setBackgroundColor(this.greyColor);
 			row.add(weightDataCell);
 			
@@ -739,6 +743,7 @@ class GoogleSheetsWriter  {
 			System.out.println("Verbose Team working on " + w.getName());
 			
 			String ss="";
+			//works
 			if ( w.getRecordBreakdown().length() > 0 ) {
 				ss = w.getRecordBreakdown() + ";" + w.getMatchesAtWeightString();
 				ss+= "\nGrade: " + w.getGrade();

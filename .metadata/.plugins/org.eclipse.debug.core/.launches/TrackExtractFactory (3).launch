@@ -13,6 +13,6 @@
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="JuniorHigh.TrackExtractFactory"/>
     <stringAttribute key="org.eclipse.jdt.launching.MODULE_NAME" value="JuniorHighWrestling"/>
-    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-type &quot;google&quot;&#10;-ot &quot;Phillipsburg&quot;&#10;-osId &quot;1_sIoeNZtgKjtGNTLfS0GiYXGTWEPlBq2AYUdGDc8_Q4&quot;&#10;-ht &quot;Hunterdon Central Reg&quot;&#10;-hsId &quot;1iiThMEtdBZRW5BGYun24p752hqRjQQ3yXUcxc6NlNoE&quot;"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-type &quot;google&quot;&#10;-ot &quot;Phillipsburg&quot;&#10;-osId &quot;1_sIoeNZtgKjtGNTLfS0GiYXGTWEPlBq2AYUdGDc8_Q4&quot;&#10;-ht &quot;Flemington&quot;&#10;-hsId &quot;1iiThMEtdBZRW5BGYun24p752hqRjQQ3yXUcxc6NlNoE&quot;&#10;-cjId &quot;1MpClc6dc1d66NOUKrv25jVjTZZF1nsQsiKpej1LThCo&quot;"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="JuniorHighWrestling"/>
 </launchConfiguration>

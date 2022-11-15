@@ -28,9 +28,14 @@ class DualMeet extends Event {
 	
 	DualMeet() {
 		
-		weights.add("106");weights.add("113");weights.add("120");weights.add("126");weights.add("132");
-		weights.add("138");weights.add("145");weights.add("152");weights.add("160");weights.add("170");
-		weights.add("182");weights.add("195");weights.add("220");weights.add("285");
+		weights.add("70");weights.add("75");weights.add("80");weights.add("85");weights.add("90");
+		weights.add("95");weights.add("100");weights.add("106");weights.add("112");weights.add("118");
+		weights.add("124");weights.add("130");weights.add("140");weights.add("150");weights.add("175");
+		weights.add("240");
+	
+//		weights.add("106");weights.add("113");weights.add("120");weights.add("126");weights.add("132");
+//		weights.add("138");weights.add("145");weights.add("152");weights.add("160");weights.add("170");
+//		weights.add("182");weights.add("195");weights.add("220");weights.add("285");
 	}
 	public String getOpponent() { return opponent; }
 	

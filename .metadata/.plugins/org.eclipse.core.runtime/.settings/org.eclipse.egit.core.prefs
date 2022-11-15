@@ -1,5 +1,5 @@
-GitRepositoriesView.GitDirectories=/Users/arnavgupta/git/TestIt/.git\:/Users/arnavgupta/git/TrackExtract/.git\:
-GitRepositoriesView.GitDirectories.relative=/Users/arnavgupta/git/TestIt/.git\:/Users/arnavgupta/git/TrackExtract/.git\:
+GitRepositoriesView.GitDirectories=/Users/arnavgupta/git/TestIt/.git\:/Users/arnavgupta/git/TrackExtract/.git\:/Users/arnavgupta/eclipse-workspace/.git\:
+GitRepositoriesView.GitDirectories.relative=/Users/arnavgupta/git/TestIt/.git\:/Users/arnavgupta/git/TrackExtract/.git\:.git\:
 RepositoryGroups.uuids=
 RepositorySearchDialogSearchPath=/Users/arnavgupta/git
 eclipse.preferences.version=1

@@ -12,12 +12,15 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.model.Sheet;
+import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -168,6 +171,23 @@ public class GoogleSheetsExtractor {
 	    	System.out.println("ERROR->" + e.toString());
 	    }
 	}
+    
+    public GoogleSheetsExtractor(String sid) {
+		//setTeam(t);
+		setSheetId(sid);
+	    try {
+	    	final NetHttpTransport HTTP_TRANSPORT = new com.google.api.client.http.javanet.NetHttpTransport();
+//	    	final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+//	    	service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+//	                .setApplicationName(APPLICATION_NAME)
+//	                .build();
+	    	Sheets.Builder s2 = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT));
+	    	s2.setApplicationName(APPLICATION_NAME);
+	        service = s2.build();
+	    } catch (Exception e) { 
+	    	System.out.println("ERROR->" + e.toString());
+	    }
+	}
     private Sheets getService() { return service; }
     
 	public String getSheetId() { return sheetId; }
@@ -183,84 +203,95 @@ public class GoogleSheetsExtractor {
 		}
 		return false;
 	}
-	private Bout extractDualMatch(String mString,String weight) throws ExcelExtractorException {
-		int x = 0x00A0;
-		char c = (char) x;
+	private Bout extractDualMatch(String weight,String wrestlerH, String wrestlerV, String resultCell, String matchName) throws ExcelExtractorException {
+		//int x = 0x00A0;
+		//char c = (char) x;
 		Bout theBout = new Bout();
 		theBout.setWeight(weight);
-		String matchString = new String(mString);
-        String cc = c  + "";
-		matchString = matchString.replaceAll(cc," ");
+		String team1 ="", visitorTeam="";
+		//String matchString = new String(mString);
+        //String cc = c  + "";
+		//matchString = matchString.replaceAll(cc," ");
 	
-		String[] tokens = matchString.split ( " over ");
+		//String[] tokens = matchString.split ( " over ");
 		
-		if ( tokens.length != 2 ) {
-			if ( matchString.equals(DOUBLE_FORFEIT_TOKEN) ) {
-				return null;
-			}
-			throw new ExcelExtractorException ("split on over failed for " + matchString,rowNumAt);
-		}
-		String firstString = tokens[0];
-		String secondString = tokens[1];
-		firstString=firstString.trim();
-		secondString=secondString.trim();	
-		int teamLocal = firstString.indexOf('(');
-		String wrestler1 = firstString.substring(0,teamLocal-1);
+//		if ( tokens.length != 2 ) {
+//			if ( matchString.equals(DOUBLE_FORFEIT_TOKEN) ) {
+//				return null;
+//			}
+//			throw new ExcelExtractorException ("split on over failed for " + matchString,rowNumAt);
+//		}
+//		String firstString = tokens[0];
+//		String secondString = tokens[1];
+//		firstString=firstString.trim();
+//		secondString=secondString.trim();	
+	//	int teamLocal = firstString.indexOf('(');
+		
+		String wrestler1 = wrestlerH;
         wrestler1=wrestler1.trim();
-		String team1 = firstString.substring(teamLocal+1,firstString.length() - 1);
+        String wrestler2 = wrestlerV;
+        wrestler2=wrestler2.trim();
+        
+        if (matchName.contains("Varsity Match")) {
+		//	verboseMessage("Varsity Match Row");
+			//varsityMatchRow = rowAt.get(0).toString();
+			String VS = matchName.split("\\|")[1];
+			 team1 = VS.split("vs.")[0].trim();
+			 visitorTeam = VS.split("vs.")[1].trim();
+		//String team1 = firstString.substring(teamLocal+1,firstString.length() - 1);
 		team1=team1.trim();		
 		
-		String result="";
-		if ( secondString.contains(") (" ) ) {
-			teamLocal=secondString.indexOf(") (");
-			result = secondString.substring(teamLocal+3,secondString.length() -1);
-		} else {
-			teamLocal= secondString.lastIndexOf('(');
-			result = secondString.substring(teamLocal+1,secondString.length() -1);
-		}
+		String result= visitorTeam;
+//		if ( secondString.contains(") (" ) ) {
+//			teamLocal=secondString.indexOf(") (");
+//			result = secondString.substring(teamLocal+3,secondString.length() -1);
+//		} else {
+//			teamLocal= secondString.lastIndexOf('(');
+//			result = secondString.substring(teamLocal+1,secondString.length() -1);
+//		}
 		
 		theBout.setResult(result);
 		
-		String secondString2 = secondString.substring(0,teamLocal);
-		secondString2=secondString2.trim();
-	    String team2="";
-		String wrestler2="";
-		if ( result.equals(FORFEIT_TOKEN) ) {
-			if ( ! secondString2.equals(UNKNOWN_TOKEN) ) {
-				throw new ExcelExtractorException("Hit fft exception",rowNumAt);
-		    }
-			wrestler2=secondString2;
-		} else {
-  		  teamLocal = secondString2.indexOf('(');
-		  wrestler2 = secondString2.substring(0,teamLocal-1);
-		  wrestler2=wrestler2.trim();
-		  team2 = secondString2.substring(teamLocal+1,secondString2.length());
-		  team2=team2.trim();
-		}
-
-		String[] res = result.split(" ");
-
-		System.out.println("res is" + result);
-		result = res[0];
+//		String secondString2 = secondString.substring(0,teamLocal);
+		//secondString2=secondString2.trim();
+	   // String team2="";
 		
-		if ( result.equals(FORFEIT_TOKEN)) {
+//		if ( result.equals(FORFEIT_TOKEN) ) {
+//			if ( ! secondString2.equals(UNKNOWN_TOKEN) ) {
+//				throw new ExcelExtractorException("Hit fft exception",rowNumAt);
+//		    }
+//			wrestler2=secondString2;
+//		} else {
+//  		  teamLocal = secondString2.indexOf('(');
+//		  wrestler2 = secondString2.substring(0,teamLocal-1);
+//		  wrestler2=wrestler2.trim();
+//		  team2 = secondString2.substring(teamLocal+1,secondString2.length());
+//		  team2=team2.trim();
+	}
+
+//		String[] res = result.split(" ");
+//
+//		System.out.println("res is" + result);
+//		result = res[0];
+        
+    
+			
+		
+//		
+		if ( resultCell.contains("Forfeit")) {
 			theBout.setMatchResultType(WrestlingLanguage.MatchResultType.FFT);
-		} else if ( result.equals(FALL_TOKEN)) {
-			theBout.setMatchResultType(WrestlingLanguage.MatchResultType.FALL) ;
-		} else if ( result.equals(TECH_TOKEN)) {
-			theBout.setMatchResultType(WrestlingLanguage.MatchResultType.TECH);
-		} else if ( result.equals(MD_TOKEN)) {
+		} else if ( resultCell.contains("Pin")) {
+			theBout.setMatchResultType(WrestlingLanguage.MatchResultType.FALL);
+		} else if ( resultCell.contains("Major Decision")) {
 			theBout.setMatchResultType(WrestlingLanguage.MatchResultType.MD) ;
-		} else if ( result.equals(DEC_TOKEN) || result.equals(SV_TOKEN) || result.equals(TB_TOKEN) || result.equals(UTB_TOKEN) ) {
+		} else if ( resultCell.contains("Decision")) {
 			theBout.setMatchResultType(WrestlingLanguage.MatchResultType.DEC);
-		} else if ( result.equals(DQ_TOKEN)) {
-			theBout.setMatchResultType(WrestlingLanguage.MatchResultType.DQ);
-		} else if ( result.equals(INJ_TOKEN)) {
+		} else if (resultCell.contains("Injury Default")){
 			theBout.setMatchResultType(WrestlingLanguage.MatchResultType.INJ);
-		} else if ( result.equals(M_FOR_TOKEN)) {
-			theBout.setMatchResultType(WrestlingLanguage.MatchResultType.MFFT);
+		} else if (resultCell.contains("Technical Fall")){
+			theBout.setMatchResultType(WrestlingLanguage.MatchResultType.TECH);
 		} else {
-			throw new ExcelExtractorException( "Unknown match result type encountered... <" + result + ">",rowNumAt );
+			throw new ExcelExtractorException( "Unknown match result type encountered... <" + resultCell + ">",rowNumAt );
 		}
 	
 		if ( team1.equals(team) ) {
@@ -268,19 +299,20 @@ public class GoogleSheetsExtractor {
 			theBout.setMainTeam(team1);
 			theBout.setWin();
 			theBout.setOpponentName(wrestler2);
-			theBout.setOpponentTeam(team2);
-		} else if (team2.equals(team) ) {
+			theBout.setOpponentTeam(visitorTeam);
+		} else if (visitorTeam.equals(team) ) {
 			theBout.setMainName(wrestler2);
-			theBout.setMainTeam(team2);
+			theBout.setMainTeam(visitorTeam);
 			theBout.setLoss();
 			theBout.setOpponentName(wrestler1);
 			theBout.setOpponentTeam(team1);
-		} else if ( result.equals(FORFEIT_TOKEN) ) {
-			return null;
-		} else if ( result.contains(DOUBLE_FORFEIT_TOKEN) ) {
-			return null;
-		} else {
-			throw new ExcelExtractorException("ERROR " + team + " not equal to " + team1 + " or " + team2,rowNumAt);
+		} 
+//		else if ( result.equals(FORFEIT_TOKEN) ) {
+//			return null;
+//		} else if ( result.contains(DOUBLE_FORFEIT_TOKEN) ) {
+//			return null;
+		 else {
+			throw new ExcelExtractorException("ERROR " + team + " not equal to " + team1 + " or " + visitorTeam,rowNumAt);
 		}	
 	
 		return theBout;
@@ -379,18 +411,12 @@ System.out.println("mString->" + mString);
 			}
 		} else if ( result.equals(FALL_TOKEN)) {
 			theBout.setMatchResultType(WrestlingLanguage.MatchResultType.FALL) ;
-		} else if ( result.equals(TECH_TOKEN)) {
-			theBout.setMatchResultType(WrestlingLanguage.MatchResultType.TECH);
-		} else if ( result.equals(MD_TOKEN)) {
+		}  else if ( result.equals(MD_TOKEN)) {
 			theBout.setMatchResultType(WrestlingLanguage.MatchResultType.MD) ;
 		} else if ( result.equals(DEC_TOKEN)|| result.equals(SV_TOKEN) || result.equals(TB_TOKEN) || result.equals(UTB_TOKEN)) {
 			theBout.setMatchResultType(WrestlingLanguage.MatchResultType.DEC);
-		} else if ( result.equals(DQ_TOKEN)) {
-			theBout.setMatchResultType(WrestlingLanguage.MatchResultType.DQ);
 		} else if ( result.equals(INJ_TOKEN)) {
 			theBout.setMatchResultType(WrestlingLanguage.MatchResultType.INJ);
-		} else if ( result.equals(NC_TOKEN )) {	
-			theBout.setMatchResultType(WrestlingLanguage.MatchResultType.NC);
 		} else {
 			throw new ExcelExtractorException( "Unknown match result type encountered... <" + result + ">" ,rowNumAt);
 		}
@@ -422,17 +448,22 @@ System.out.println("mString->" + mString);
 		}
 		DualMeet theDual = new DualMeet();
 		theDual.setMainTeam(team);
-		int lastParen = tokens[1].lastIndexOf('(');
-		String team1 = tokens[0];
-		String team2 = tokens[1].substring(0,lastParen -1);
-		String dt = tokens[1].substring(lastParen+1,tokens[1].length()-1);
-		if ( team1.equals(team) ) { 
-			theDual.setOpponent(team2);
+		//change somerhing here
+		//int lastParen = tokens[1].lastIndexOf('(');
+//		String team1 = tokens[0];
+//		String team2 = tokens[1].substring(0,lastParen -1);
+		//tokens[1].substring(lastParen+1,tokens[1].length()-1);
+		String VS = eventString.split("\\|")[1];
+		String dt = eventString.substring(14,24);
+		String homeTeam = VS.split("vs.")[0].trim();
+		String visitorTeam = VS.split("vs.")[1].trim();
+		if ( homeTeam.equals(team) ) { 
+			theDual.setOpponent(visitorTeam);
 		} else {
-			theDual.setOpponent(team1);
+			theDual.setOpponent(homeTeam);
 		}
 		theDual.setEventDate(dt);
-		theDual.setEventTitle(team2 + " Dual");
+		theDual.setEventTitle(visitorTeam + " Dual");
 		
 		return theDual;
 	}
@@ -616,17 +647,28 @@ System.out.println("mString->" + mString);
 	   verboseMessage("Processed Tourney Headers Successfully."); 
 	   return rowCheck;
   }	
-	private int processDualMatches(DualMeet d, List<List<Object>> resultSheet) throws ExcelExtractorException {
-       int rowCheck=1;
+	private int processDualMatches(DualMeet d, List<List<Object>> resultSheet, String eventString) throws ExcelExtractorException {
+       int rowCheck=0;
 	   /*
 	    *   Should find 14 weights in a dual.  
 		*/
        // NEED TO FIX WEIGHT CLASS NUMBERS
-	   for ( int i=0; i<14; i++ ) {
+	   for ( int i=0; i<16; i++ ) {
 			List<Object> aRow = resultSheet.get(rowNumAt+rowCheck);
-			String weightCell = aRow.get(1).toString();
-			String matchCell = aRow.get(2).toString();
-			Bout b = extractDualMatch(matchCell,weightCell);
+			String weightCell = aRow.get(0).toString();
+			String wrestlerH = aRow.get(1).toString();
+			String wrestlerV = aRow.get(2).toString();
+			/*
+			if (wrestlerH.equals("Forfeit")) {
+				wrestlerH=null;
+			}
+			else if (wrestlerV.equals("Forfeit")) {
+				wrestlerH=null;
+			}
+			*/
+			String result = aRow.get(3).toString();
+			//String matchCell = aRow.get(4).toString();
+			Bout b = extractDualMatch(weightCell,wrestlerH, wrestlerV, result,eventString);
 			if ( b == null ) {
 				verboseMessage("Processed non match row..." );
 			} else {
@@ -766,6 +808,242 @@ System.out.println("mString->" + mString);
 		}
 		return t;
 	}
+	public Team extractAllTeams() throws Exception{
+		int rowNum = 0;
+		rowNumAt=0;
+		String sheetName = "";
+		Team t ;
+		Teams a = new Teams();
+		
+		
+		String sheetRange =  "";
+		
+		
+		Spreadsheet response1= service.spreadsheets().get(this.getSheetId()).setIncludeGridData (false).execute ();
+
+		List<Sheet> workSheetList = response1.getSheets();
+
+		for (Sheet sheet : workSheetList) {
+			rowNum =0;
+			rowNumAt=0;
+			sheetName = sheet.getProperties().getTitle();
+			t = new Team();
+			t.setTeamName(sheetName);
+			sheetRange =  sheetName + "!A:H";
+			
+			ValueRange rangeSheet = service.spreadsheets().values()
+		              .get(this.getSheetId(), sheetRange)
+		                .execute();
+		    List<List<Object>> valuesSheet = rangeSheet.getValues();
+			
+			
+			
+			
+		/*	
+			String rangeResult =  SHEET_RESULTS + "!A:H";
+			
+			ValueRange responseResults = service.spreadsheets().values()
+	                .get(this.getSheetId(), rangeResult)
+	                .execute();
+
+			List<List<Object>> valuesResult = responseResults.getValues();
+	*/
+	        ArrayList<String> arrRoster = new ArrayList<String>();
+	        String varsityMatchRow ="";
+	        String homeTeam ="";
+	        String visitorTeam="";
+			
+	       
+	        while ( rowNum < valuesSheet.size() ) {			  
+				verboseMessage("RESULTS: PROCESSING ROW " + rowNum + "..." );
+				List<Object> rowAt = valuesSheet.get(rowNum);
+				if ( rowAt ==  null || rowAt.size() == 0 ) {
+					/* Skip null rows */
+				//	verboseMessage("Cell: null row. ");  
+				} else {
+				//	verboseMessage("ROSTER: ROW<" + rowNumAt + "> Cells<" + rowAt.size() + ">");
+					if (rowAt.get(0).toString().contains("Varsity Match")) {
+						verboseMessage("Varsity Match Row");
+						varsityMatchRow = rowAt.get(0).toString();
+						String VS = varsityMatchRow.split("\\|")[1];
+						homeTeam = VS.split("vs.")[0].trim();
+						visitorTeam = VS.split("vs.")[1].trim();
+						
+						//continue;
+					}
+					
+					else if ( rowAt.size() >= 7 ) {
+						
+					
+						
+						String headerCell = rowAt.get(1).toString();
+
+						if ( headerCell.equals(Result_NAME_TOKEN) ) {
+							verboseMessage("RESLUT: at header row.");
+						} else {
+							
+							
+							//Creating strings to hold the values
+							//String WGTVal= rowAt.get(0).toString();
+							String namevalH = rowAt.get(1).toString();
+							String namevalV = rowAt.get(2).toString();
+							
+							if (sheetName == homeTeam) {
+								if(!arrRoster.contains(namevalH)) {
+									arrRoster.add(namevalH);
+								}
+							}
+							else {
+								if(!arrRoster.contains(namevalV)) {
+									arrRoster.add(namevalV);
+									}
+							}
+							
+						
+						}
+					} else {
+						verboseMessage("RESULTS: Skipping Row...");
+					}
+				} 
+				rowNum++;
+			}
+	       verboseMessage(arrRoster.toString());
+	       
+	       for(int i=0; i<arrRoster.size(); i++) {
+	    	   if (arrRoster.get(i) == "Forfeit" || arrRoster.get(i) == ""|| arrRoster.get(i) == null )
+	    	   {
+	    		   System.out.println(arrRoster.get(i));
+	    	   }
+	    	   else {
+	    		   Wrestler aWrestler = new Wrestler(arrRoster.get(i),sheetName);
+					//aWrestler.setName(nameval);
+					extractResults(aWrestler, valuesSheet);
+					t.addWrestler(aWrestler);
+					//adding the team into a list with all the teams objects stored
+					a.addTeam(t);
+					//create a new class with all the teams
+					
+	    		   
+	    		   
+	    	   }
+	    	  
+	    	      
+	    	   
+	      }
+			verboseMessage(t.toString());
+			
+		    System.out.println(sheetName);
+		}
+		
+		return null;
+	}
+	
+	public Team extractResultsForDual(Team theTeam) throws Exception {
+		/*
+		 * This is the processing of the sheet that has dual and tourney results for a team on it.
+		 */		   
+		rowNumAt=0;
+		
+		String range = SHEET_RESULTS + "!A:H";
+		
+		ValueRange response = service.spreadsheets().values()
+	                .get(this.getSheetId(), range)
+	                .execute();
+	    List<List<Object>> values = response.getValues();
+		
+		if ( values.size() == 0 ) {
+			return theTeam;
+		}
+		String varsityMatchRow = "", homeTeam = "", visitorTeam = "", eventString="";
+
+		/*
+		 * This while loop will process chunks of the results.  This is why the rowAt is not incremented
+		 * in the main line of a for loop.
+		 */
+		boolean inAnEventFlag = false;   /* this flag tells me if we are processing an event */
+		while ( rowNumAt < values.size() ) {	
+			
+			verboseMessage("PROCESSING ROW ...");
+			  
+			List<Object> rowAt = values.get(rowNumAt);
+			if ( rowAt.size() == 0 ) {
+				/* Skip empty rows */
+				verboseMessage(" empty row. ");
+				
+			} else {
+				
+				if (rowAt.get(0).toString().contains("Varsity Match")) 
+				{
+					eventString=rowAt.get(0).toString();
+					
+					verboseMessage("Varsity Match Row");
+					varsityMatchRow = rowAt.get(0).toString();
+					String VS = varsityMatchRow.split("\\|")[1];
+					homeTeam = VS.split("vs.")[0].trim();
+					visitorTeam = VS.split("vs.")[1].trim();
+					
+					//continue;
+				}
+				
+				else if ( rowAt.size() >= 7 ) {
+					
+					
+					
+					String headerCell = rowAt.get(1).toString();
+
+					if ( headerCell.equals(Result_NAME_TOKEN) ) {
+						verboseMessage("RESLUT: at header row.");
+					} else {
+						
+						String namevalH = rowAt.get(1).toString();
+						String namevalV = rowAt.get(2).toString();
+						
+					
+					      verboseMessage(" is a match <" + eventString + ">");
+						  inAnEventFlag = true;
+						  /*
+						   *  Check to see if it is a dual
+						   */
+						   if ( this.isADual(eventString) ) {
+							   verboseMessage(" and dual confirmed. ");
+							   DualMeet d = this.initializeDual(eventString);
+							 //  rowNumAt++;
+							   /* This code makes sure the next 6 records are of dual format. 
+							    * It will throw an exception if not.
+								
+								*/
+							   //right now commenting this bc as it is only doing validations
+							  // this.processDualHeaderRows(values);
+							   
+							   verboseMessage("----- Dual:" + d );
+							   /*
+							    * Now we process the dual itself.
+							    */
+							   int addRow = this.processDualMatches(d, values, eventString);
+							   rowNumAt += addRow;
+							   
+							   verboseMessage("rowNumAt now " + rowNumAt);
+							   /* look for trailer record. */
+//							   rowAt = values.get(rowNumAt);
+//							   if (rowAt != null) {
+//								   String c = rowAt.get(0).toString();
+//								   
+//							   }
+							   theTeam.addDualMeet(d);
+							   inAnEventFlag=false;
+						   } 
+					
+					}
+				}
+				/* Check and See if we are at a new event. */
+				
+				
+		}
+		
+		rowNumAt++;
+		}
+		return theTeam;
+	}
 	private void extractResults(Wrestler w, List<List<Object>> values) throws Exception {
 		verboseMessage("Roster name "+ w.getName());
 		int rowNum=0;
@@ -778,35 +1056,47 @@ System.out.println("mString->" + mString);
 
 //		
 //	    //Printing the number of cells with value
-	   // verboseMessage("Cells: " + values.size());;
+	    verboseMessage("Cells: " + values.size());;
 		/*
 		 * This will read in an initialize the team roster.
 		 * Loops through all the wrestler to create a team
 		 */
 		while ( rowNum < values.size() ) {			  
-			//verboseMessage("RESULTS: PROCESSING ROW " + rowNumAt + "..." );
+			verboseMessage("RESULTS: PROCESSING ROW " + rowNumAt + "..." );
 			List<Object> rowAt = values.get(rowNum);
 			if ( rowAt ==  null ) {
 				/* Skip null rows */
-			//	verboseMessage("Cell: null row. ");  
+				verboseMessage("Cell: null row. ");  
 			} else {
-			//	verboseMessage("ROSTER: ROW<" + rowNumAt + "> Cells<" + rowAt.size() + ">");
+				verboseMessage("ROSTER: ROW<" + rowNumAt + "> Cells<" + rowAt.size() + ">");
 				if ( rowAt.size() >= 7 ) {
 					String headerCell = rowAt.get(1).toString();
 
 					if ( headerCell.equals(Result_NAME_TOKEN) ) {
-			//			verboseMessage("RESLUT: at header row.");
+						verboseMessage("RESLUT: at header row.");
 					} else {
 						//Creating strings to hold the values
-						//String WGTVal= rowAt.get(0).toString();
 						String namevalH = rowAt.get(1).toString();
 						String namevalV = rowAt.get(2).toString();
+						
+						if (namevalH.equals("Forfeit")) {
+							namevalH = null;
+						}
+						else if (namevalV.equals("Forfeit")) {
+							namevalV = null;
+						}
+						String WGTVal= rowAt.get(0).toString();
+//						if (!(rowAt.get(1).toString().equals("Forfeit")&&!(rowAt.get(1).toString().equals("Forfeit")))) {
+//							namevalH = rowAt.get(1).toString();
+//							namevalV = rowAt.get(2).toString();
+//						}
+						
 						String resultVal = rowAt.get(3).toString();
 					
-						//verboseMessage( WGTVal + namevalH + namevalV + resultVal);
+						verboseMessage( WGTVal + namevalH + namevalV + resultVal);
 						
 						String currentWrestlerName= w.getName();
-			//		verboseMessage("Arnav:currentWrestlerName= "+currentWrestlerName+" namevalH= "+namevalH+" namevalV= "+namevalV);
+			//		verboseMessage("currentWrestlerName= "+currentWrestlerName+" namevalH= "+namevalH+" namevalV= "+namevalV);
 						
 						if((currentWrestlerName.equals(namevalH))||(currentWrestlerName.equals(namevalV))) {
 							
@@ -882,6 +1172,128 @@ System.out.println("mString->" + mString);
 			rowNum++;
 		}
 	}
+
+	private void extractResultsOLD(Wrestler w, List<List<Object>> values) throws Exception {
+		verboseMessage("Roster name "+ w.getName());
+		int rowNum=0;
+		//Setting the range value
+//		String range = SHEET_RESULTS + "!A:H";
+//		
+//		ValueRange response = service.spreadsheets().values()
+//	                .get(this.getSheetId(), range)
+//	                .execute();
+
+//		
+//	    //Printing the number of cells with value
+		verboseMessage("Cells: " + values.size());;
+		/*
+		 * This will read in an initialize the team result.
+		 */
+		while ( rowNum < values.size() ) {			  
+			//verboseMessage("RESULTS: PROCESSING ROW " + rowNumAt + "..." );
+			List<Object> rowAt = values.get(rowNum);
+			if ( rowAt ==  null ) {
+				/* Skip null rows */
+			//	verboseMessage("Cell: null row. ");  
+			} else {
+			//	verboseMessage("ROSTER: ROW<" + rowNumAt + "> Cells<" + rowAt.size() + ">");
+				//This is the start of the header row
+				if ( rowAt.size() >= 7 ) {
+					
+					String headerCell = rowAt.get(1).toString();
+					verboseMessage(headerCell);
+
+					if ( headerCell.equals(Result_NAME_TOKEN) ) {
+						//verboseMessage("RESLUT: at header row.");
+					} else {
+						//Creating strings to hold the values
+						int WGTVal= Integer.parseInt(rowAt.get(0).toString());
+						String namevalH = rowAt.get(1).toString();
+						String namevalV = rowAt.get(2).toString();
+						String resultVal = rowAt.get(3).toString();
+					//	w.setWeight(WGTVal);
+						//verboseMessage( WGTVal + namevalH + namevalV + resultVal);
+						
+						String currentWrestlerName= w.getName();
+						//verboseMessage("Arnav:currentWrestlerName= "+currentWrestlerName+" namevalH= "+namevalH+" namevalV= "+namevalV);
+						
+						if((currentWrestlerName.equals(namevalH))||(currentWrestlerName.equals(namevalV))) {
+							
+							w.setWeight(Integer.valueOf(rowAt.get(0).toString()));
+							
+							verboseMessage("Found record for "+ currentWrestlerName);
+							if(currentWrestlerName.equals(namevalH) && resultVal.contains("Win")) {
+								w.addWin();
+								if(resultVal.contains("Pin")) {
+									w.addWinByFall();
+								}
+								else if (resultVal.contains("Forfeit")) {
+									w.addWinByFFT();
+								}
+								else if (resultVal.contains("Decision")) {
+									w.addWinByDec();
+								}
+								else if (resultVal.contains("Major Decision")) {
+									w.addWinByMD();
+								}
+							}
+							if(currentWrestlerName.equals(namevalH) && resultVal.contains("Loss")) {
+								w.addLoss();
+								if(resultVal.contains("Pin")) {
+									w.addLossByFall();
+								}
+								else if (resultVal.contains("Forfeit")) {
+									w.addLossByFFT();
+								}
+								else if (resultVal.contains("Decision")) {
+									w.addLossByDec();
+								}
+								else if (resultVal.contains("Major Decision")) {
+									w.addLossByMD();
+								}
+							}
+							if(currentWrestlerName.equals(namevalV) && resultVal.contains("Win")) {
+								w.addLoss();
+								if(resultVal.contains("Pin")) {
+									w.addLossByFall();
+								}
+								else if (resultVal.contains("Forfeit")) {
+									w.addLossByFFT();
+								}
+								else if (resultVal.contains("Decision")) {
+									w.addLossByDec();
+								}
+								else if (resultVal.contains("Major Decision")) {
+									w.addLossByMD();
+								}
+								
+							}
+							if(currentWrestlerName.equals(namevalV) && resultVal.contains("Loss")) {
+								w.addWin();
+								if(resultVal.contains("Pin")) {
+									w.addWinByFall();
+								}
+								else if (resultVal.contains("Forfeit")) {
+									w.addWinByFFT();
+								}else if (resultVal.contains("Decision")) {
+									w.addWinByDec();
+								}
+								else if (resultVal.contains("Major Decision")) {
+									w.addWinByMD();
+								}
+							}
+						}
+					}
+				} else {
+					//verboseMessage("RESULTS: Skipping Row...");
+				}
+			} 
+			rowNum++;
+		}
+	}
+	
+	
+	
 	
 	private Team extractWeighInHistory(Team t) throws Exception {
 		rowNumAt=0;
@@ -1104,144 +1516,144 @@ System.out.println("mString->" + mString);
 		if ( r.size() == 1 && r.get(0).toString().length() == 0 ) { return true; }
 		return false;
 	}
-    public Team OLDextractResults(Team theTeam) throws Exception {
-		/*
-		 * This is the processing of the sheet that has dual and tourney results for a team on it.
-		 */		   
-		rowNumAt=0;
-		
-		String range = SHEET_RESULTS + "!A:E";
-		
-		ValueRange response = service.spreadsheets().values()
-	                .get(this.getSheetId(), range)
-	                .execute();
-	    List<List<Object>> values = response.getValues();
-		
-		if ( values.size() == 0 ) {
-			return theTeam;
-		}
-
-		/*
-		 * This while loop will process chunks of the results.  This is why the rowAt is not incremented
-		 * in the main line of a for loop.
-		 */
-		boolean inAnEventFlag = false;   /* this flag tells me if we are processing an event */
-		while ( rowNumAt < values.size() ) {			  
-			verboseMessage("PROCESSING ROW ...");
-			  
-			List<Object> rowAt = values.get(rowNumAt);
-			if ( rowAt.size() == 0 ) {
-				/* Skip empty rows */
-				verboseMessage(" empty row. ");
-				rowNumAt++;
-			} else {
-				/* Check and See if we are at a new event. */
-				if ( inAnEventFlag == false ) {
-                    verboseMessage("InAnEventFlag is false"); 
-					if ( ! firstColOnlyContent(rowAt) ) {
-						if ( garbageRecord(rowAt) ) {
-							verboseMessage("Skipping a garbage record");
-						} else {
-							throw new ExcelExtractorException("Something weird PhysicalNumberOfCells is <" + rowAt.size() + "> expecting 0",rowNumAt);
-						}	
-					} else {
-						String cellZero = rowAt.get(0).toString();
-						if ( isMatchHeaderToken(rowAt) ) {
-							throw new ExcelExtractorException("Something weird",rowNumAt);
-						} else if ( cellZero.startsWith(OFFICIAL_TOKEN) ) {
-							verboseMessage("Skip row, it is a lingering Official row from dual.");
-						} else if ( cellZero.startsWith(WINNING_TEAM_TOKEN) ) {
-							verboseMessage("Skip row, winning team footer.");
-						} else if ( cellZero.startsWith(CLICK_HERE_TOKEN) ) {
-							verboseMessage("Skip row, click here row found.");
-						} else {
-						  /* 
-						   * We are at a new event.  Next step is to see if it is a tournament or a dual.
-						   */
-						  String eventString = cellZero;
-					      verboseMessage(" is a match <" + eventString + ">");
-						  inAnEventFlag = true;
-						  /*
-						   *  Check to see if it is a dual
-						   */
-						   if ( this.isADual(eventString) ) {
-							   verboseMessage(" and dual confirmed. ");
-							   DualMeet d = this.initializeDual(eventString);
-							   rowNumAt++;
-							   /* This code makes sure the next 6 records are of dual format. 
-							    * It will throw an exception if not.
-								*/
-							   this.processDualHeaderRows(values);
-							   
-							   verboseMessage("----- Dual:" + d );
-							   /*
-							    * Now we process the dual itself.
-							    */
-							   int addRow = this.processDualMatches(d,values);
-							   rowNumAt += addRow;
-							   verboseMessage("rowNumAt now " + rowNumAt);
-							   /* look for trailer record. */
-							   rowAt = values.get(rowNumAt);
-							   if (rowAt != null) {
-								   String c = rowAt.get(0).toString();
-								   if ( c.equals(DUAL_FOOTER_USP)) {
-									  verboseMessage("At Unsportsmanlike point");
-									  rowNumAt++;
-									  rowAt=values.get(rowNumAt);
-									  c = rowAt.get(0).toString();
-
-								   }
-								   if ( c.equals(DUAL_FOOTER_TOKEN) ) {
-									   verboseMessage("At Dual Footer row " );
-								   } else {
-									   rowNumAt--;
-								   }
-							   }
-							   theTeam.addDualMeet(d);
-							   inAnEventFlag=false;
-						   } 
-						   /*
-						    * If it is not a dual, check to see if it is a tournament.
-						    */
-						    else if ( isATourney(eventString) ) {
-								Tournament t = initializeTourney(eventString);
-								verboseMessage(" and a tourney confirmed. ");
-								 /* This code makes sure the next 6 records are of dual format. 
-							    * It will throw an exception if not.
-								*/
-							   int addRow = this.processTourneyHeaderRows(values);
-							   rowNumAt += addRow; 
-							   verboseMessage("----- Tourney:" + t);
-							    /*
-							    * Now we process the tourney itself.
-							    */
-							   addRow = this.processTourneyMatches(t,values);
-							   rowNumAt += addRow;
-							   verboseMessage("rowNumAt now " + rowNumAt);
-							   theTeam.addTournament(t);
-							   inAnEventFlag=false;
-						    }
-						   /* 
-						    * Something went wrong, throw an exception....
-							*/
-							else {
-								throw new ExcelExtractorException("Can't determine if dual or tourney. ",rowNumAt);
-						    }
-						}
-					}	
-					rowNumAt++;
-				} else {   /*here we are already in an event */
-					if ( isMatchHeaderToken(rowAt) ){
-						verboseMessage(" is a match token") ;
-					} else {
-						verboseMessage(" is not a match token");
-				    }
-					rowNumAt++;
-				}
-			}
-		}
-		return theTeam;
-	}
+//    public Team OLDextractResults(Team theTeam) throws Exception {
+//		/*
+//		 * This is the processing of the sheet that has dual and tourney results for a team on it.
+//		 */		   
+//		rowNumAt=0;
+//		
+//		String range = SHEET_RESULTS + "!A:E";
+//		
+//		ValueRange response = service.spreadsheets().values()
+//	                .get(this.getSheetId(), range)
+//	                .execute();
+//	    List<List<Object>> values = response.getValues();
+//		
+//		if ( values.size() == 0 ) {
+//			return theTeam;
+//		}
+//
+//		/*
+//		 * This while loop will process chunks of the results.  This is why the rowAt is not incremented
+//		 * in the main line of a for loop.
+//		 */
+//		boolean inAnEventFlag = false;   /* this flag tells me if we are processing an event */
+//		while ( rowNumAt < values.size() ) {			  
+//			verboseMessage("PROCESSING ROW ...");
+//			  
+//			List<Object> rowAt = values.get(rowNumAt);
+//			if ( rowAt.size() == 0 ) {
+//				/* Skip empty rows */
+//				verboseMessage(" empty row. ");
+//				rowNumAt++;
+//			} else {
+//				/* Check and See if we are at a new event. */
+//				if ( inAnEventFlag == false ) {
+//                    verboseMessage("InAnEventFlag is false"); 
+//					if ( ! firstColOnlyContent(rowAt) ) {
+//						if ( garbageRecord(rowAt) ) {
+//							verboseMessage("Skipping a garbage record");
+//						} else {
+//							throw new ExcelExtractorException("Something weird PhysicalNumberOfCells is <" + rowAt.size() + "> expecting 0",rowNumAt);
+//						}	
+//					} else {
+//						String cellZero = rowAt.get(0).toString();
+//						if ( isMatchHeaderToken(rowAt) ) {
+//							throw new ExcelExtractorException("Something weird",rowNumAt);
+//						} else if ( cellZero.startsWith(OFFICIAL_TOKEN) ) {
+//							verboseMessage("Skip row, it is a lingering Official row from dual.");
+//						} else if ( cellZero.startsWith(WINNING_TEAM_TOKEN) ) {
+//							verboseMessage("Skip row, winning team footer.");
+//						} else if ( cellZero.startsWith(CLICK_HERE_TOKEN) ) {
+//							verboseMessage("Skip row, click here row found.");
+//						} else {
+//						  /* 
+//						   * We are at a new event.  Next step is to see if it is a tournament or a dual.
+//						   */
+//						  String eventString = cellZero;
+//					      verboseMessage(" is a match <" + eventString + ">");
+//						  inAnEventFlag = true;
+//						  /*
+//						   *  Check to see if it is a dual
+//						   */
+//						   if ( this.isADual(eventString) ) {
+//							   verboseMessage(" and dual confirmed. ");
+//							   DualMeet d = this.initializeDual(eventString);
+//							   rowNumAt++;
+//							   /* This code makes sure the next 6 records are of dual format. 
+//							    * It will throw an exception if not.
+//								*/
+//							   this.processDualHeaderRows(values);
+//							   
+//							   verboseMessage("----- Dual:" + d );
+//							   /*
+//							    * Now we process the dual itself.
+//							    */
+//							   int addRow = this.processDualMatches(d,values);
+//							   rowNumAt += addRow;
+//							   verboseMessage("rowNumAt now " + rowNumAt);
+//							   /* look for trailer record. */
+//							   rowAt = values.get(rowNumAt);
+//							   if (rowAt != null) {
+//								   String c = rowAt.get(0).toString();
+//								   if ( c.equals(DUAL_FOOTER_USP)) {
+//									  verboseMessage("At Unsportsmanlike point");
+//									  rowNumAt++;
+//									  rowAt=values.get(rowNumAt);
+//									  c = rowAt.get(0).toString();
+//
+//								   }
+//								   if ( c.equals(DUAL_FOOTER_TOKEN) ) {
+//									   verboseMessage("At Dual Footer row " );
+//								   } else {
+//									   rowNumAt--;
+//								   }
+//							   }
+//							   theTeam.addDualMeet(d);
+//							   inAnEventFlag=false;
+//						   } 
+//						   /*
+//						    * If it is not a dual, check to see if it is a tournament.
+//						    */
+//						    else if ( isATourney(eventString) ) {
+//								Tournament t = initializeTourney(eventString);
+//								verboseMessage(" and a tourney confirmed. ");
+//								 /* This code makes sure the next 6 records are of dual format. 
+//							    * It will throw an exception if not.
+//								*/
+//							   int addRow = this.processTourneyHeaderRows(values);
+//							   rowNumAt += addRow; 
+//							   verboseMessage("----- Tourney:" + t);
+//							    /*
+//							    * Now we process the tourney itself.
+//							    */
+//							   addRow = this.processTourneyMatches(t,values);
+//							   rowNumAt += addRow;
+//							   verboseMessage("rowNumAt now " + rowNumAt);
+//							   theTeam.addTournament(t);
+//							   inAnEventFlag=false;
+//						    }
+//						   /* 
+//						    * Something went wrong, throw an exception....
+//							*/
+//							else {
+//								throw new ExcelExtractorException("Can't determine if dual or tourney. ",rowNumAt);
+//						    }
+//						}
+//					}	
+//					rowNumAt++;
+//				} else {   /*here we are already in an event */
+//					if ( isMatchHeaderToken(rowAt) ){
+//						verboseMessage(" is a match token") ;
+//					} else {
+//						verboseMessage(" is not a match token");
+//				    }
+//					rowNumAt++;
+//				}
+//			}
+//		}
+//		return theTeam;
+//	}
 	private void setPrestige(Wrestler w, String tourney, String round, WrestlingLanguage.WinOrLose worl, int year ) throws ExcelExtractorException {
 
 		WrestlingLanguage.Prestige pNow = null;
@@ -1643,6 +2055,7 @@ System.out.println("mString->" + mString);
 	public Team extractTeam() throws Exception {
 
         Team theTeam = new Team();
+       // Team theTeam2 = new Team();
         verboseMessage("Starting..."); // Display the string.
 		verboseMessage("Working with file <" + this.getSheetId() + "> team <" + this.getTeam() + ">"); 
 		  
@@ -1657,6 +2070,10 @@ System.out.println("mString->" + mString);
 		* then process the roster.
 		*/
 		theTeam = this.extractRoster(theTeam);
+		
+		theTeam = this.extractResultsForDual(theTeam);
+		
+		//theTeam = this.extractAllTeams();
 
 		/*
 		 * Process Weigh In History.

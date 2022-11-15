@@ -1,10 +1,8 @@
- while (e.hasMoreElements()) {
+Enumeration<Integer> e = ht.keys();
  
-            // Getting the key of a particular entry
-            int key = e.nextElement();
+        // Iterating through the Hashtable
+        // object
  
-            // Print and display the Rank and Name
-            System.out.println("Rank : " + key
-                               + "\t\t Name : "
-                               + ht.get(key));
-        }
+        // Checking for next element in Hashtable object
+        // with the help of hasMoreElements() method
+        while (e.hasMoreElements()) {

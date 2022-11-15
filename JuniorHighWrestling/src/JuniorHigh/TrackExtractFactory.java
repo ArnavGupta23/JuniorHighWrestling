@@ -17,7 +17,7 @@ class TrackExtractFactory {
 	private static String homeSheetId;		// home sheet id if using google.
 	private static String homeFile;			// home file if using excel.
 	private static String homeTeam="";		// home team name ( this is the name the website uses for them.
-	
+	private static String CJResultsId;			// home file if using excel.
     private static void processArgs(String[] args) throws Exception {
 		int i=0;
 		System.out.println("args are " + args.length + "    ->" + args );
@@ -48,6 +48,10 @@ class TrackExtractFactory {
 			} else if (arg.equals("-osId") ) {
 				i++;
 				opponentSheetId = args[i];
+			} else if (arg.equals("-cjId") ) {
+				
+				i++;
+				CJResultsId= args[i];
 			} else if (arg.equals("-type") ) {
 				i++;
 				fileType = args[i];
@@ -68,8 +72,10 @@ class TrackExtractFactory {
         try {
 			processArgs(args);
 			if ( fileType.equals("google")) {
-				System.out.println("Opponent =<" + opponentTeam + "> opponentSheetId=<" + opponentSheetId + "> homeTeam<" + homeTeam + "> homeSheetId=<" + homeSheetId + ">");
+				System.out.println("Opponent =<" + opponentTeam + "> opponentSheetId=<" + opponentSheetId + "> homeTeam<" + homeTeam + "> homeSheetId=<" + homeSheetId + ">" + "cjId>"+ CJResultsId);
 				GoogleSheetsExtractor extractor = new GoogleSheetsExtractor(opponentTeam,opponentSheetId);
+				//use for all teams
+				//GoogleSheetsExtractor extractor = new GoogleSheetsExtractor(CJResultsId);
 				System.out.println("Working with file <" + opponentSheetId + "> opponentTeam <" + opponentTeam + ">"); 
 				Team theOpponentTeam = extractor.extractTeam();
 				GoogleSheetsExtractor homeExtractor = new GoogleSheetsExtractor(homeTeam,homeSheetId);

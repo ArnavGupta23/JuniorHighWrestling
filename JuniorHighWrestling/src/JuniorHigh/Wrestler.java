@@ -10,7 +10,7 @@ import java.util.Enumeration;
 class Wrestler {
 	private String name;
 	private String seed;
-	private String cert;
+	private String cert="";
 	private String teamName;
 	private WrestlingLanguage.Grade grade;
 	private WrestlingLanguage.Gender gender;
@@ -42,7 +42,7 @@ class Wrestler {
 	private int lossByMD;
 	private int lossByTech;
 	
-	private int weight;
+	//private int weight;
 	
 	private Hashtable<Integer,Integer> matchWeight=new Hashtable<Integer,Integer>();
 
@@ -99,6 +99,20 @@ class Wrestler {
 		else {
 		matchWeight.put(w, 1);	
 		}
+		
+	}
+	
+	public String getMatchLowestWeight() {
+		Enumeration<Integer> e = matchWeight.keys();
+		int minVal=999;
+        while (e.hasMoreElements()) {
+        	  int key = e.nextElement();
+        	  if (key < minVal) {
+        		  minVal = key;
+        	  }
+        	 
+        }
+        return String.valueOf(minVal);
 		
 	}
 	public String getWeight() {
@@ -341,7 +355,7 @@ class Wrestler {
 	   if ( b.isAWin() ) {
           addWin();	
           switch ( b.getMatchResultType() ) {
-			  case FFT: 
+          		case FFT: 
 			    addWinByFFT();
 				break;
 			  case FALL:
@@ -358,8 +372,9 @@ class Wrestler {
 				break;
 			  case INJ:
 			    break;
-			  case DQ:
-			    break;
+//			  case DQ:
+//				    break;
+			  
 		  }
        } else {
           addLoss();
@@ -372,7 +387,7 @@ class Wrestler {
 			    addLossByFall();
 				break;
 			  case TECH:
-			    addLossByTech();
+				addLossByTech();
 				break;
 			  case MD:
 			    addLossByMD();
@@ -395,8 +410,8 @@ class Wrestler {
 			    lossByInjuryString += b.getOpponentTeam();
 			    
 			    break;
-			  case DQ:
-			    break;
+//			  case DQ:
+//			    break;
 		  }		  
        }		  
 	}
@@ -428,4 +443,33 @@ class Wrestler {
 	public int hashCode() {
 		return getName().hashCode() + getTeamName().hashCode();
 	}
+
+
+public String getFinWeight() {
+	String finWeight = "";
+	//boolean a = playedMatch();
+	
+	if(!cert.equals("0") || !(cert == null)) {
+		finWeight = cert;
+	}
+	else if ((cert.equals("0") || cert.equals(""))&&playedMatch()== true){
+		finWeight = getMatchLowestWeight();
+	}
+	else if (cert.equals("0")&&this.playedMatch()== false&& !seed.equals("0")) {
+		finWeight = seed;
+	}
+	else {
+		finWeight = "9999";
+	}
+	
+	return finWeight;
+}
+
+public boolean playedMatch() {
+	if (wins == 0 && losses == 0) {
+		return false;
+}	
+	return true;
+}
+
 }
