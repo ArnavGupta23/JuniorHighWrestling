@@ -1,14 +1,14 @@
-package JuniorHigh;
+package statsProcessor;
 
 import java.util.*;
 /*
  *
  * THis is a class to hold a team 
  */
-class Team {
+class GSTeam {
 
     private String teamName;
-	private List<DualMeet> duals = new ArrayList<DualMeet> ();
+	private List<GSDualMeet> duals = new ArrayList<GSDualMeet> ();
     private List<Tournament> tournaments = new ArrayList<Tournament> ();	
 	private List<Tournament> prestigeLastYear = new ArrayList<Tournament> ();
 	private List<Tournament> prestige2YearsAgo = new ArrayList<Tournament>();
@@ -16,11 +16,11 @@ class Team {
  	/*
 	 * This roster is key'd on the wrestler's name.
 	 */
-	private Hashtable<String,Wrestler> theRoster = new Hashtable<String, Wrestler> ();
+	private Hashtable<String,GSWrestler> theRoster = new Hashtable<String, GSWrestler> ();
 
-    private Hashtable<String,Wrestler> lastYearRoster = new Hashtable<String,Wrestler> ();
+    private Hashtable<String,GSWrestler> lastYearRoster = new Hashtable<String,GSWrestler> ();
 	
-	private List<Wrestler>  notWrestlingThisYear;
+	private List<GSWrestler>  notWrestlingThisYear;
 	
 	private Hashtable<String,List<Bout>> allBouts;
 	
@@ -35,8 +35,8 @@ class Team {
 	public void addPrestige2YearsAgoTournament(Tournament t) { prestige2YearsAgo.add(t); }
 	public void addPrestige3YearsAgoTournament(Tournament t) { prestige3YearsAgo.add(t); }
 	
-	public Hashtable<String,Wrestler> getRoster() { return theRoster; }
-	public List<Wrestler> getNotWrestlingThisYear() {
+	public Hashtable<String,GSWrestler> getRoster() { return theRoster; }
+	public List<GSWrestler> getNotWrestlingThisYear() {
 		return notWrestlingThisYear;
 	}
 	public boolean wrestlerExists(String w) {
@@ -45,17 +45,17 @@ class Team {
 	public boolean wrestlerLastYearExists(String w) {
 		return lastYearRoster.contains(w);
 	}
-	public void addWrestler(Wrestler w) {
+	public void addWrestler(GSWrestler w) {
 		theRoster.put(w.getName(),w);
 	}
-	public void addLastYearWrestler(Wrestler w) {
+	public void addLastYearWrestler(GSWrestler w) {
 		lastYearRoster.put(w.getName(),w);
 	}
 	
-	public Wrestler getWrestler(String n) {
+	public GSWrestler getWrestler(String n) {
 		return theRoster.get(n);
 	}
-	public Wrestler getLastYearWrestler(String n) {
+	public GSWrestler getLastYearWrestler(String n) {
 		return lastYearRoster.get(n);
 	}
 	
@@ -65,7 +65,7 @@ class Team {
 	public int getEventCount() {
 		return duals.size() + tournaments.size();
 	}
-	public void addDualMeet(DualMeet d) {
+	public void addDualMeet(GSDualMeet d) {
 		  duals.add(d);
 		  Hashtable<String,Bout> theBouts = d.getBouts();
 		  Set<String> keys = theBouts.keySet();
@@ -73,10 +73,10 @@ class Team {
 	
 			  Bout b = theBouts.get(key);
 
-			  Wrestler wrestlerAt = theRoster.get(b.getMainName());
+			  GSWrestler wrestlerAt = theRoster.get(b.getMainName());
 
 			  if ( wrestlerAt == null ) {
-				  Wrestler newWrestler = new Wrestler(b.getMainName(),b.getMainTeam());
+				  GSWrestler newWrestler = new GSWrestler(b.getMainName(),b.getMainTeam());
 				  newWrestler.addBout(b);
 				  theRoster.put(newWrestler.getName(),newWrestler);
 		      } else {
@@ -89,9 +89,9 @@ class Team {
         List<Bout> theBouts = t.getBouts();
 	 for ( int i=0; i < theBouts.size() ; i++ ) {
           Bout b = theBouts.get(i);
-          Wrestler wrestlerAt = theRoster.get(b.getMainName());
+          GSWrestler wrestlerAt = theRoster.get(b.getMainName());
           if ( wrestlerAt == null ) {
-            Wrestler newWrestler = new Wrestler(b.getMainName(),b.getMainTeam());
+            GSWrestler newWrestler = new GSWrestler(b.getMainName(),b.getMainTeam());
 			newWrestler.addBout(b);
 			theRoster.put(newWrestler.getName(),newWrestler);
 		  } else {
@@ -103,7 +103,7 @@ class Team {
 		System.out.println("Team: " + getTeamName() );
 		Set<String> keys = theRoster.keySet();
 		for (String key: keys ) {
-			Wrestler wrestlerAt = theRoster.get(key);
+			GSWrestler wrestlerAt = theRoster.get(key);
 			wrestlerAt.printVerbose();
 		}
 	}
@@ -111,7 +111,7 @@ class Team {
 		allBouts = new Hashtable<String,List<Bout>> ();
 		Set<String> keys = theRoster.keySet();
 		for (String key: keys ) {
-			Wrestler wrestlerAt = theRoster.get(key);
+			GSWrestler wrestlerAt = theRoster.get(key);
 			List<Bout> bouts = wrestlerAt.getBouts();
 			for ( int i=0; i < bouts.size(); i++ ) {
 				Bout b = bouts.get(i);
@@ -146,8 +146,8 @@ class Team {
 		Set<String> keys = theRoster.keySet();
 		for (String key: keys ) {
 
-			Wrestler lastYearWrestler = lastYearRoster.get(key);
-			Wrestler atWrestler = theRoster.get(key);
+			GSWrestler lastYearWrestler = lastYearRoster.get(key);
+			GSWrestler atWrestler = theRoster.get(key);
 			if ( lastYearWrestler != null ) {
 				atWrestler = theRoster.get(key);
 				atWrestler.setRosteredLastYearOn();
@@ -157,13 +157,13 @@ class Team {
 				atWrestler.setRosteredLastYearOff();	
 			}
 		}
-		notWrestlingThisYear = new ArrayList<Wrestler> ();
+		notWrestlingThisYear = new ArrayList<GSWrestler> ();
 		keys = lastYearRoster.keySet();
 		for ( String key: keys ) {
-			Wrestler w = theRoster.get(key);
+			GSWrestler w = theRoster.get(key);
 			
 			if ( w == null ) {
-				Wrestler nRostered = lastYearRoster.get(key);
+				GSWrestler nRostered = lastYearRoster.get(key);
 				if ( nRostered != null ) {
 			
 					if ( nRostered.getGrade() != WrestlingLanguage.Grade.G7 ) {

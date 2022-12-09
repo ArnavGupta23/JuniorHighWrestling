@@ -1,7 +1,7 @@
 /**
  * 
  */
-package JuniorHigh;
+package statsProcessor;
 
 /**
  * @author Mike
@@ -12,10 +12,10 @@ package JuniorHigh;
 class WrestlingLanguage {
  
   
-   //public static enum MatchResultType { FALL, TECH, MD, DEC, FFT, INJ, DQ, NC, MFFT };
-   public static enum MatchResultType { FALL, MD, DEC, FFT, INJ, TECH };
+   public static enum MatchResultType { FALL, TECH, MD, DEC, FFT, INJ, DQ, NC, MFFT };
+   //public static enum MatchResultType { FALL, MD, DEC, FFT, INJ, TECH };
    public static enum WinOrLose { WIN, LOSS };
-   public static enum Grade { G5, G6, G7, G8 };
+   public static enum Grade { G5, G6, G7, G8, FR, SO, JR, SR };
    public static enum Gender { M, F };
 
    public static enum Prestige { 

@@ -1,4 +1,4 @@
-package JuniorHigh;
+package statsProcessor;
 
 
 import java.util.*;
@@ -335,12 +335,12 @@ class ExcelExtractor {
 		return theBout;
 		
 	}
-	private DualMeet initializeDual(String eventString) throws ExcelExtractorException {
+	private GSDualMeet initializeDual(String eventString) throws ExcelExtractorException {
 		String[] tokens = eventString.split(" vs. ");
 		if (tokens.length != 2 ) {
 			throw new ExcelExtractorException ("error in initializeDualString with " + eventString + " length is " + tokens.length,rowNumAt);
 		}
-		DualMeet theDual = new DualMeet();
+		GSDualMeet theDual = new GSDualMeet();
 		theDual.setMainTeam(team);
 		int lastParen = tokens[1].lastIndexOf('(');
 		String team1 = tokens[0];
@@ -531,7 +531,7 @@ class ExcelExtractor {
 	   verboseMessage("Processed Tourney Headers Successfully."); 
 	   return rowCheck-1;
   }	
-	private int processDualMatches(DualMeet d, Sheet resultSheet, int rowAt) throws ExcelExtractorException {
+	private int processDualMatches(GSDualMeet d, Sheet resultSheet, int rowAt) throws ExcelExtractorException {
        int rowCheck=1;
 	   /*
 	    *   Should find 14 weights in a dual.  
@@ -601,7 +601,7 @@ class ExcelExtractor {
 			System.out.println("ROWAT<" + rowNumAt + ">-" + message);
 		}
 	}
-	private Team extractRoster(Sheet rSheet,Team t) throws ExcelExtractorException {
+	private GSTeam extractRoster(Sheet rSheet,GSTeam t) throws ExcelExtractorException {
 	    int firstRow = rSheet.getFirstRowNum();
 		int lastRow = rSheet.getLastRowNum();
 		verboseMessage("Roster: firstRow = " + firstRow + " last row = " + lastRow );
@@ -651,7 +651,7 @@ class ExcelExtractor {
 						if ( t.wrestlerExists(nameCell.getStringCellValue()) ) {
 							throw new ExcelExtractorException("ROSTER: wrestler " + nameCell.getStringCellValue() + " exists already.",rowNumAt);
 						} else {
-							Wrestler aWrestler = new Wrestler(nameCell.getStringCellValue(),team);
+							GSWrestler aWrestler = new GSWrestler(nameCell.getStringCellValue(),team);
 							aWrestler.setTrackWtClass(wtClassVal);
 							aWrestler.setGender(getGender(genderVal));
 							aWrestler.setGrade(getGrade(gradeVal));
@@ -669,7 +669,7 @@ class ExcelExtractor {
 		}
 		return t;
 	}
-	private Team extractWeighInHistory(Sheet rSheet,Team t) throws ExcelExtractorException {
+	private GSTeam extractWeighInHistory(Sheet rSheet,GSTeam t) throws ExcelExtractorException {
 		if ( rSheet == null ) {
 			return t;
 		}
@@ -681,7 +681,7 @@ class ExcelExtractor {
 		 */
 		
 		rowNumAt=firstRow;
-		Wrestler wrestlerAt;
+		GSWrestler wrestlerAt;
 		while ( rowNumAt <= lastRow+1 ) {			  
 			verboseMessage("WeighInHistory: PROCESSING ROW " + rowNumAt + " ...");
 			Row rowAt = rSheet.getRow(rowNumAt);
@@ -822,7 +822,7 @@ System.out.println("processing " + dt );
 			throw new ExcelExtractorException( "Unknown Grade Token found <" + gs + ">", rowNumAt);
 		}
 	}
-	private Team extractLastYearRoster(Sheet rSheet,Team t) throws ExcelExtractorException {
+	private GSTeam extractLastYearRoster(Sheet rSheet,GSTeam t) throws ExcelExtractorException {
 	    int firstRow = rSheet.getFirstRowNum();
 		int lastRow = rSheet.getLastRowNum();
 		verboseMessage("Last Year Roster: firstRow = " + firstRow + " last row = " + lastRow );
@@ -864,7 +864,7 @@ System.out.println("processing " + dt );
 					if ( t.wrestlerLastYearExists(nameCell.getStringCellValue()) ) {
 						throw new ExcelExtractorException("LAST YEAR ROSTER: wrestler " + nameCell.getStringCellValue() + " exists already.",rowNumAt);
 					} else {
-						Wrestler aWrestler = new Wrestler(nameCell.getStringCellValue(),team);
+						GSWrestler aWrestler = new GSWrestler(nameCell.getStringCellValue(),team);
 						aWrestler.printVerbose();
 						aWrestler.setTrackWtClass(wtClassVal);
 						aWrestler.setGender(getGender(genderVal));
@@ -933,7 +933,7 @@ System.out.println("processing " + dt );
 		}
 		return true;
 	}
-    public Team extractResults(Team theTeam, Sheet resultsSheet) throws Exception {
+    public GSTeam extractResults(GSTeam theTeam, Sheet resultsSheet) throws Exception {
 		/*
 		 * This is the processing of the sheet that has dual and tourney results for a team on it.
 		 */		   
@@ -984,7 +984,7 @@ System.out.println("processing " + dt );
 						   */
 						   if ( isADual(eventString) ) {
 							   verboseMessage(" and dual confirmed. ");
-							   DualMeet d = initializeDual(eventString);
+							   GSDualMeet d = initializeDual(eventString);
 							   rowNumAt++;
 							   /* This code makes sure the next 6 records are of dual format. 
 							    * It will throw an exception if not.
@@ -1053,7 +1053,7 @@ System.out.println("processing " + dt );
 		}
 		return theTeam;
 	}
-	private void setPrestige(Wrestler w, String tourney, String round, WrestlingLanguage.WinOrLose worl, int year ) throws ExcelExtractorException {
+	private void setPrestige(GSWrestler w, String tourney, String round, WrestlingLanguage.WinOrLose worl, int year ) throws ExcelExtractorException {
 
 		WrestlingLanguage.Prestige pNow = null;
 		
@@ -1298,7 +1298,7 @@ System.out.println("processing " + dt );
 		}
 
 	}
-	private void syncPrestige(Team theTeam, int year) throws ExcelExtractorException {
+	private void syncPrestige(GSTeam theTeam, int year) throws ExcelExtractorException {
 	
 		
 		List<Tournament> lyt;
@@ -1328,7 +1328,7 @@ System.out.println("processing " + dt );
 				} else {
 					throw new ExcelExtractorException("Unexexpected Event string <" + t.getEventTitle(), rowNumAt);
 				}
-				Wrestler w = theTeam.getWrestler(name);
+				GSWrestler w = theTeam.getWrestler(name);
 				if ( w != null ) {
 					setPrestige(w,tourney,round,theBouts.get(ii).getWinOrLose(),year);
 				}
@@ -1336,7 +1336,7 @@ System.out.println("processing " + dt );
 		}
 		return;
 	}
-	public Team extractPrestige(Team theTeam, Sheet prestigeSheet,int year) throws Exception {
+	public GSTeam extractPrestige(GSTeam theTeam, Sheet prestigeSheet,int year) throws Exception {
 		/*
 		 * This is the processing of last year's prestige sheet.
 		 */		   
@@ -1435,9 +1435,9 @@ System.out.println("processing " + dt );
 		syncPrestige(theTeam,year);
 		return theTeam;
 	}
-	public Team extractTeam() throws Exception {
+	public GSTeam extractTeam() throws Exception {
 
-        Team theTeam = new Team();
+        GSTeam theTeam = new GSTeam();
         verboseMessage("Starting..."); // Display the string.
 		verboseMessage("Working with file <" + filename + "> team <" + team + ">"); 
 		Workbook workbook = WorkbookFactory.create(new File(filename));

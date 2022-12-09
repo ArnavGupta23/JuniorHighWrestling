@@ -1,4 +1,4 @@
-package JuniorHigh;
+package statsProcessor;
 
 import java.util.*;
 import java.text.SimpleDateFormat;

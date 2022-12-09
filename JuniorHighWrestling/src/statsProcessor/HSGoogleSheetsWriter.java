@@ -1,4 +1,4 @@
-package JuniorHigh;
+package statsProcessor;
 
 
 import java.util.*;
@@ -32,7 +32,7 @@ import java.io.InputStreamReader;
  * This class is used to write to googlesheets any of the data that has been
  * accumulated.
  */
-class GoogleSheetsWriter  {
+class HSGoogleSheetsWriter  {
  
   
 	private String sheetId;
@@ -55,7 +55,7 @@ class GoogleSheetsWriter  {
 
 
 	
-    public GoogleSheetsWriter(String t, String sid) {
+    public HSGoogleSheetsWriter(String t, String sid) {
 		setTeam(t);
 		setSheetId(sid);
 		try {
@@ -67,7 +67,6 @@ class GoogleSheetsWriter  {
 		   Spreadsheet sp = service.spreadsheets().get(this.getSheetId()).execute();
 		   List<Sheet> sheets = sp.getSheets();
 		   System.out.println("XXXXXXXXXXXXXXXXXx->" + sheets.get(0).getProperties().getTitle());
-		   //setting the colors
 		   greyColor.setRed(Float.valueOf("50")); greyColor.setBlue(Float.valueOf("50"));greyColor.setGreen(Float.valueOf("50"));
 			blueColor.setRed(Float.valueOf("0.0")); blueColor.setBlue(Float.valueOf("1.0"));blueColor.setGreen(Float.valueOf("0.0"));
 			redColor.setRed(Float.valueOf("1.0")); redColor.setBlue(Float.valueOf("0.0"));redColor.setGreen(Float.valueOf("0.0"));
@@ -119,7 +118,7 @@ class GoogleSheetsWriter  {
 	
     private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
         // Load client secrets.
-        InputStream in = GoogleSheetsWriter.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+        InputStream in = HSGoogleSheetsWriter.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
         if (in == null) {
             throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
         }
@@ -165,12 +164,11 @@ class GoogleSheetsWriter  {
 	   	ArrayList<Wrestler> aw = new ArrayList<Wrestler> (wc);	
 	   	Comparator<Wrestler> compareIt = new Comparator<Wrestler>() {
 				public int compare(Wrestler w1, Wrestler w2) {
-					String wS=w1.getFinWeight();
-					String w2S=w2.getFinWeight();
+					String wS=w1.getPrintWeight();
+					String w2S=w2.getPrintWeight();
 					
 					int i = wS.compareTo(w2S);
 					if ( i == 0 ) {
-						//check getPrintRank
 						int m1 = w1.getPrintRank();
 						int m2 = w2.getPrintRank();
 						i=m2-m1;
@@ -211,7 +209,6 @@ class GoogleSheetsWriter  {
 		hBorders.setBottom(new Border().setStyle("SOLID_THICK"));
 		headerFormat.setBorders(hBorders);
 			
-		//creating header record
 		CellData weightH = new CellData().setUserEnteredValue(new ExtendedValue().setStringValue("Weight"));
 		headerrow.add(weightH);
 		CellFormat leftHeaderFormat = headerFormat.clone();
@@ -250,7 +247,6 @@ class GoogleSheetsWriter  {
 		CellFormat rightHeaderFormat = headerFormat.clone();
 		rightHeaderFormat.getBorders().setRight(new Border().setStyle("SOLID_THICK"));
 		lastWIH.setUserEnteredFormat(rightHeaderFormat);
-		//end of header record
 		
 		int count=0;
 		String atWeightStr="";
@@ -275,7 +271,7 @@ class GoogleSheetsWriter  {
 			Wrestler w = aw.get(count);
 			System.out.println("w=" + w);
 				
-			String wWeight = w.getFinWeight();
+			String wWeight = w.getPrintWeight();
 				
 			if (! wWeight.equals(atWeightStr)) {
 				atNewWeight=true;
@@ -300,11 +296,10 @@ class GoogleSheetsWriter  {
 			}
 			weightDataCell.setUserEnteredFormat(weightDataCellFormat);
 			if ( atNewWeight ) {
-				weightDataCell.setUserEnteredValue(new ExtendedValue().setStringValue(w.getFinWeight())) ;
-			} 
-//			else {
-//				weightDataCell.setUserEnteredValue(new ExtendedValue().setStringValue(w.getFinWeight()))  ;
-			//}
+				weightDataCell.setUserEnteredValue(new ExtendedValue().setStringValue(w.getPrintWeight())) ;
+			} else {
+				weightDataCell.setUserEnteredValue(new ExtendedValue().setStringValue(""))  ;
+			}
 			if ( oddWeight) { 
 				weightDataCellFormat.setBackgroundColor(greyColor);
 			}
@@ -450,8 +445,7 @@ class GoogleSheetsWriter  {
 					notes = common;
 				}
 			}
-			CellFormat notesDataCellFormat = new CellFormat(); 
-			notesDataCellFormat.setWrapStrategy("WRAP");				
+			CellFormat notesDataCellFormat = new CellFormat(); notesDataCellFormat.setWrapStrategy("WRAP");				
 			if ( w.getLossByInjury() ) {
 				if ( notes.length() > 0 ) {
 					notes = notes + "\n" + w.getLossByInjuryString();
@@ -539,7 +533,7 @@ class GoogleSheetsWriter  {
 			atNewWeight=false;
 			count++;			
 		}
-		//Creating the new sheet
+
 		AddSheetRequest addSheet = new AddSheetRequest();
 		addSheet.setProperties(new SheetProperties().setTitle(GAMEPLAN_SHEET));
 		List<Request> requests = new ArrayList<Request>();
@@ -605,7 +599,7 @@ class GoogleSheetsWriter  {
                 .setFields("pixelSize"));
 	    resizeCellsRequestList.add(wiWidthR); 
 	    
-	 	//pushing everything to the sheet
+	 	    
 		batchUpdateR.setRequests(resizeCellsRequestList);
 		service.spreadsheets().batchUpdate(this.getSheetId(), batchUpdateR).execute();
 		
@@ -655,8 +649,8 @@ class GoogleSheetsWriter  {
 
 		Comparator<Wrestler> compareIt = new Comparator<Wrestler>() {
 			public int compare(Wrestler w1, Wrestler w2) {
-				String wS=w1.getFinWeight();
-				String w2S=w2.getFinWeight();
+				String wS=w1.getPrintWeight();
+				String w2S=w2.getPrintWeight();
 				
 				int i = wS.compareTo(w2S);
 				if ( i == 0 ) {
@@ -730,7 +724,7 @@ class GoogleSheetsWriter  {
 			CellData weightDataCell = new CellData(); 
 			CellFormat weightDataCellFormat = leftHeaderFormat.clone();
 			weightDataCell.setUserEnteredFormat(weightDataCellFormat);
-			weightDataCell.setUserEnteredValue(new ExtendedValue().setStringValue(w.getFinWeight())) ;
+			weightDataCell.setUserEnteredValue(new ExtendedValue().setStringValue(w.getPrintWeight())) ;
 			weightDataCellFormat.setBackgroundColor(this.greyColor);
 			row.add(weightDataCell);
 			
@@ -743,7 +737,6 @@ class GoogleSheetsWriter  {
 			System.out.println("Verbose Team working on " + w.getName());
 			
 			String ss="";
-			//works
 			if ( w.getRecordBreakdown().length() > 0 ) {
 				ss = w.getRecordBreakdown() + ";" + w.getMatchesAtWeightString();
 				ss+= "\nGrade: " + w.getGrade();
@@ -752,7 +745,7 @@ class GoogleSheetsWriter  {
 			}
 			
 			WeighInHistory wih = w.getWeighInHistory();
-			String wIStr="\nInitial WeighIn: ";
+			String wIStr="\nInitial Weighin: ";
 			if ( wih == null ) {
 				wIStr += "None";
 				

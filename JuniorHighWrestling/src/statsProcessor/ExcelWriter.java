@@ -1,4 +1,4 @@
-package JuniorHigh;
+package statsProcessor;
 
 
 import java.util.*;
@@ -41,7 +41,7 @@ class ExcelWriter  {
 			System.out.println(m);
 		}
 	}
-	public void writeRoster(Sheet rSheet, Team oppTeam,Team homeTeam) {
+	public void writeRoster(Sheet rSheet, GSTeam oppTeam,GSTeam homeTeam) {
 	
 		Workbook wb = rSheet.getWorkbook();
 		
@@ -50,13 +50,13 @@ class ExcelWriter  {
 		rSheet.setMargin(Sheet.TopMargin, 0.5);
 		rSheet.setMargin(Sheet.BottomMargin, 0.5);
 		
-		Hashtable<String,Wrestler> theRoster = oppTeam.getRoster();
+		Hashtable<String,GSWrestler> theRoster = oppTeam.getRoster();
 				
-		Collection<Wrestler> wc = theRoster.values();
-		ArrayList<Wrestler> aw = new ArrayList<Wrestler> (wc);
+		Collection<GSWrestler> wc = theRoster.values();
+		ArrayList<GSWrestler> aw = new ArrayList<GSWrestler> (wc);
 		
-		Comparator<Wrestler> compareIt = new Comparator<Wrestler>() {
-			public int compare(Wrestler w1, Wrestler w2) {
+		Comparator<GSWrestler> compareIt = new Comparator<GSWrestler>() {
+			public int compare(GSWrestler w1, GSWrestler w2) {
 				String wS=w1.getPrintWeight();
 				String w2S=w2.getPrintWeight();
 				
@@ -144,7 +144,7 @@ class ExcelWriter  {
 
 		boolean atNewWeight=true;
 		while ( aw.size() > count ) {
-			Wrestler w = aw.get(count);
+			GSWrestler w = aw.get(count);
 			System.out.println("w=" + w);
 			
 			String wWeight = w.getPrintWeight();
@@ -333,7 +333,7 @@ if (g != null) { gg = g.toString(); }
 		
 		return;
 	}
-	public void writeVerboseTeam(Sheet rSheet, Team oppTeam,Team homeTeam) {
+	public void writeVerboseTeam(Sheet rSheet, GSTeam oppTeam,GSTeam homeTeam) {
 		
 		Workbook wb = rSheet.getWorkbook();
 		
@@ -352,13 +352,13 @@ if (g != null) { gg = g.toString(); }
 		cc.setCellStyle(header);
 		cc.setCellValue(homeTeam.getTeamName() + " vs. " + oppTeam.getTeamName() + " Results Details");
 		
-		Hashtable<String,Wrestler> theRoster = oppTeam.getRoster();
+		Hashtable<String,GSWrestler> theRoster = oppTeam.getRoster();
 		
-		Collection<Wrestler> wc = theRoster.values();
-		ArrayList<Wrestler> aw = new ArrayList<Wrestler> (wc);
+		Collection<GSWrestler> wc = theRoster.values();
+		ArrayList<GSWrestler> aw = new ArrayList<GSWrestler> (wc);
 
-		Comparator<Wrestler> compareIt = new Comparator<Wrestler>() {
-			public int compare(Wrestler w1, Wrestler w2) {
+		Comparator<GSWrestler> compareIt = new Comparator<GSWrestler>() {
+			public int compare(GSWrestler w1, GSWrestler w2) {
 				String wS=w1.getPrintWeight();
 				String w2S=w2.getPrintWeight();
 				
@@ -405,7 +405,7 @@ if (g != null) { gg = g.toString(); }
 
 		while ( aw.size() > count ) {
 		
-			Wrestler w = aw.get(count);
+			GSWrestler w = aw.get(count);
 		
 			r = rSheet.createRow(sheetRowNum);
 			
@@ -583,7 +583,7 @@ if (g != null) { gg = g.toString(); }
 		rSheet.setFitToPage(true);
 		return;
 	}
-    public void writeTeam(Team theOppTeam,Team homeTeam) {
+    public void writeTeam(GSTeam theOppTeam,GSTeam homeTeam) {
 
         try {
   	   

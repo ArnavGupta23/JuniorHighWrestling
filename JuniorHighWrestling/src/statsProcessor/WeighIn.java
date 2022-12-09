@@ -1,4 +1,4 @@
-package JuniorHigh;
+package statsProcessor;
 
 /*
  *  This is a class to holds an individual WeighIn

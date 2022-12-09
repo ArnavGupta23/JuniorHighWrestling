@@ -1,4 +1,4 @@
-package JuniorHigh;
+package statsProcessor;
 
 class ExcelExtractorException extends Exception {
 	static final long serialVersionUID = 43L;

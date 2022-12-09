@@ -1,7 +1,7 @@
 /**
  * 
  */
-package JuniorHigh;
+package statsProcessor;
 
 /**
  * @author Mike

@@ -1,4 +1,4 @@
-package JuniorHigh;
+package statsProcessor;
 
 
 /**
@@ -8,7 +8,7 @@ package JuniorHigh;
  * 2) Extract using screen scraping.
  * 3) Extract using api calls.  I'm not sure this will ever be possible.
  */
-class TrackExtractFactory {
+class ExtractFactory {
    
 	private static String fileType; 		//type of file google or excel
 	private static String opponentSheetId;  //opponent sheet id if using google.
@@ -18,6 +18,8 @@ class TrackExtractFactory {
 	private static String homeFile;			// home file if using excel.
 	private static String homeTeam="";		// home team name ( this is the name the website uses for them.
 	private static String CJResultsId;			// home file if using excel.
+	private static String ageLevel=""; 		//This should be GS or HS
+	
     private static void processArgs(String[] args) throws Exception {
 		int i=0;
 		System.out.println("args are " + args.length + "    ->" + args );
@@ -55,6 +57,9 @@ class TrackExtractFactory {
 			} else if (arg.equals("-type") ) {
 				i++;
 				fileType = args[i];
+			} else if (arg.equals("-al") ) {
+				i++;
+				ageLevel=args[i];
 			} else {
 				 throw new Exception ("Unknown Argument <" + args[i]);
 			}
@@ -72,23 +77,39 @@ class TrackExtractFactory {
         try {
 			processArgs(args);
 			if ( fileType.equals("google")) {
+				
 				System.out.println("Opponent =<" + opponentTeam + "> opponentSheetId=<" + opponentSheetId + "> homeTeam<" + homeTeam + "> homeSheetId=<" + homeSheetId + ">" + "cjId>"+ CJResultsId);
-				GoogleSheetsExtractor extractor = new GoogleSheetsExtractor(opponentTeam,opponentSheetId);
-				//use for all teams
-				//GoogleSheetsExtractor extractor = new GoogleSheetsExtractor(CJResultsId);
-				System.out.println("Working with file <" + opponentSheetId + "> opponentTeam <" + opponentTeam + ">"); 
-				Team theOpponentTeam = extractor.extractTeam();
-				GoogleSheetsExtractor homeExtractor = new GoogleSheetsExtractor(homeTeam,homeSheetId);
-				Team homeTeam= homeExtractor.extractTeam();
-				GoogleSheetsWriter e = new GoogleSheetsWriter(opponentTeam,opponentSheetId);
-				e.writeTeam(theOpponentTeam,homeTeam);
+
+				if (ageLevel.equals("GS") ) {
+					GSGoogleSheetsExtractor extractor = new GSGoogleSheetsExtractor(opponentTeam,opponentSheetId);
+					//use for all teams
+					//GoogleSheetsExtractor extractor = new GoogleSheetsExtractor(CJResultsId);
+					System.out.println("Working with file <" + opponentSheetId + "> opponentTeam <" + opponentTeam + ">"); 
+					GSTeam theOpponentTeam = extractor.extractTeam();
+					GSGoogleSheetsExtractor homeExtractor = new GSGoogleSheetsExtractor(homeTeam,homeSheetId);
+					GSTeam homeTeam= homeExtractor.extractTeam();
+					GSGoogleSheetsWriter e = new GSGoogleSheetsWriter(opponentTeam,opponentSheetId);
+					e.writeTeam(theOpponentTeam,homeTeam);
+				} else if ( ageLevel.contentEquals("HS" ) ) {
+					HSGoogleSheetsExtractor extractor = new HSGoogleSheetsExtractor(opponentTeam,opponentSheetId);
+					//use for all teams
+					//GoogleSheetsExtractor extractor = new GoogleSheetsExtractor(CJResultsId);
+					System.out.println("Working with file <" + opponentSheetId + "> opponentTeam <" + opponentTeam + ">"); 
+					Team theOpponentTeam = extractor.extractTeam();
+					HSGoogleSheetsExtractor homeExtractor = new HSGoogleSheetsExtractor(homeTeam,homeSheetId);
+					Team homeTeam= homeExtractor.extractTeam();
+					HSGoogleSheetsWriter e = new HSGoogleSheetsWriter(opponentTeam,opponentSheetId);
+					e.writeTeam(theOpponentTeam,homeTeam);
+				} else {
+					System.out.println("You need to set -al for Age Level.  Values are 'GS' or 'HS'.");
+				}
 			} else if ( fileType.equals("excel")) {
 				System.out.println("Opponent =<" + opponentTeam + "> opponentFile=<" + opponentFile + "> homeTeam<" + homeTeam + "> homeFile=<" + homeFile + ">");
 				ExcelExtractor extractor = new ExcelExtractor(opponentTeam,opponentFile);
 				System.out.println("Working with file <" + opponentFile + "> opponentTeam <" + opponentTeam + ">"); 
-				Team theOpponentTeam = extractor.extractTeam();
+				GSTeam theOpponentTeam = extractor.extractTeam();
 				ExcelExtractor homeExtractor = new ExcelExtractor(homeTeam,homeFile);
-				Team homeTeam= homeExtractor.extractTeam();
+				GSTeam homeTeam= homeExtractor.extractTeam();
 				ExcelWriter e = new ExcelWriter(opponentTeam,opponentFile);
 				e.writeTeam(theOpponentTeam,homeTeam);
 				
